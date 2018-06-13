@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="WG" basedir=".">
+	<target name="params" description="Defining params">
+		<input message="Filename:" addproperty="file.name" defaultvalue="myzup"/> 
+		<input message="Debug build?" addproperty="debug_build" defaultvalue="n" validargs="y,n"/>
+	</target>
+
+    <target name="debug-check" depends="params">
+		<condition property="debug.append">
+			<equals arg1="y" arg2="${debug_build}"/>
+		</condition>
+    </target>	
+
+    <target name="clean" description="Delete all generated archives" depends="debug-check">
+		<delete>
+			<fileset dir="." includes="**/*.zip"/>
+		</delete>
+    </target>
+	
+<!-- 1 -->	
+    <target name="client" depends="clean" unless="debug.append">
+        <zip basedir="client" destfile="client.zip" includes="**/*.pyc" excludes="**/debug/"/>
+    </target>
+    <target name="client-debug" depends="clean" if="debug.append">
+        <zip basedir="client" destfile="client.zip" includes="**/*.pyc, **/debug/"/>
+    </target>
+<!-- 2 -->
+    <target name="nonobfus" depends="clean">
+        <zip basedir="client" destfile="nonobfus.zip" includes="**/*.pyco"/>
+    </target>
+	
+<!-- 3 -->
+
+</project>
