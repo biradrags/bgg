@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="WG" basedir="." >
+<project name="WG" basedir="." default="artifacts">
 <!-- 0 -->
 	<target name="params" description="Defining params">
 		<input message="Debug build?" addproperty="debug_build" defaultvalue="n" validargs="y,n"/>
