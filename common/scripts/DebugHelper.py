@@ -5,7 +5,7 @@ h="hello"
 w="world"
 print(h+' '+w)
 
-DEBUG_MODE=""
+DEBUG_MODE=false
 
 massive = (1,2,3,4)
 print(massive[2])

@@ -1,34 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="WG" basedir=".">
+<project name="WG" basedir="." >
+<!-- 0 -->
 	<target name="params" description="Defining params">
-		<input message="Filename:" addproperty="file.name" defaultvalue="myzup"/> 
 		<input message="Debug build?" addproperty="debug_build" defaultvalue="n" validargs="y,n"/>
+		<input message="Compress level" addproperty="compress_level" defaultvalue="5" validargs="0,1,2,3,4,5,6,7,8,9"/> 
 	</target>
 
-    <target name="debug-check" depends="params">
-		<condition property="debug.append">
+    <target name="check-vars" depends="params">
+		<condition property="debug.true">
 			<equals arg1="y" arg2="${debug_build}"/>
 		</condition>
     </target>	
 
-    <target name="clean" description="Delete all generated archives" depends="debug-check">
+    <target name="clean" description="Delete all generated archives" depends="check-vars">
 		<delete>
 			<fileset dir="." includes="**/*.zip"/>
 		</delete>
     </target>
 	
 <!-- 1 -->	
-    <target name="client" depends="clean" unless="debug.append">
-        <zip basedir="client" destfile="client.zip" includes="**/*.pyc" excludes="**/debug/"/>
+    <target name="client" depends="clean" unless="debug.true">
+		<replaceregexp file="common/scripts/DebugHelper.py" match="^(DEBUG_MODE)=(.*)" replace="\1=false" byline="true"/>
+        <zip basedir="client" destfile="client.zip" includes="**/*.pyc" excludes="**/debug/" level="${compress_level}"/>
     </target>
-    <target name="client-debug" depends="clean" if="debug.append">
-        <zip basedir="client" destfile="client.zip" includes="**/*.pyc, **/debug/"/>
+    <target name="client-debug" depends="clean" if="debug.true">
+		<replaceregexp file="common/scripts/DebugHelper.py" match="^(DEBUG_MODE)=(.*)" replace="\1=true" byline="true"/>
+        <zip basedir="client" destfile="client.zip" includes="**/*.pyc, **/debug/" level="${compress_level}"/>
     </target>
 <!-- 2 -->
-    <target name="nonobfus" depends="clean">
-        <zip basedir="client" destfile="nonobfus.zip" includes="**/*.pyco"/>
+    <target name="nonobfus" depends="client, client-debug">
+        <zip basedir="client" destfile="nonobfus.zip" includes="**/*.pyco" level="${compress_level}"/>
     </target>
 	
 <!-- 3 -->
-
+    <target name="artifacts" depends="nonobfus">
+        <copy todir="./artifacts">
+			<fileset dir="." includes="*.zip"/>
+		</copy>
+    </target>
 </project>
